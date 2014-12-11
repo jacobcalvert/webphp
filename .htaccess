@@ -1,0 +1,13 @@
+###################################
+# This .htaccess file uses mod_rewrite
+# to modify the urls and send them
+# to the appropriate server file 
+# for url mapping.
+####################################
+
+RewriteEngine  on
+
+RewriteBase /
+
+# everything below the site root will be written to server.php?url={the_url}
+RewriteRule   ^(.*)/?$ server.php?url=/$1 [L,QSA] 
