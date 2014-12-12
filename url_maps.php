@@ -28,5 +28,6 @@ include_once 'classes/UrlMap.class.php';
 $url_maps = array
 (
     new webphp\UrlMap("/?", array(), 'ExampleHandler', array('require_ssl'=>true)),
-    new webphp\UrlMap("/(.+)/?", array("the_variable"),'ExampleHandler', array())
+    new webphp\UrlMap("/(.+)/?", array("the_variable"),'ExampleHandler', array()),
+    new webphp\UrlMap("/always_ssl/(.+)/?", array("the_variable"), 'AlwaysSSLHandler', array())
 );

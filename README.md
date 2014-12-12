@@ -22,14 +22,18 @@ access that URL, the parent WebRequest class will return a 501 (Not Implemented)
 ### Features
 * Inheritable WebRequest class to provide basic API implementation quickly
 * Ability to force SSL on a URL map
+* Ability to force SSL on all URLs using a specific handler
 
 
 ### Issues
 * There is a StaticFileHandler class that can do text based stuff, but I have yet to figure out how to get it to do binary type like MPEG
 * Getting the key=>value pairs from PUT, DELETE, etc. is a little tricky still. If the request is made using a form-data encoding as opposed to raw, I can't capture them
+* Relies on .htaccess for the rewrite magic
 * I will certainly find more!!
 
 
 ### Updates
 * Added ability to force SSL (see the example in the url_maps.php file) for a UrlMap [12/11/2014]
+* Added pre_init and post_init methods so a child class can do extra initialization without rewriting the constructor [12/12/2014]
+* Added example for forcing ssl on every URL that uses a specific handler [12/12/2014]
 Thanks for looking!

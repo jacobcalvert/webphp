@@ -36,10 +36,32 @@ class WebRequest
      * @param $request_headers the HTTP request headers
      * @param $params optional parameters
      */
-    public function __construct($request_headers, $params = array())
+    final public function __construct($request_headers, $params = array())
     {
-        $this->request_headers = $request_headers;
-        $this->params = $params;
+        $this->pre_init();
+        // we merge the two param arrays in case the subclass sets 
+        // values in the pre_init method
+        $this->request_headers = array_merge($this->request_headers,$request_headers);
+        $this->params = array_merge($this->params,$params);
+        $this->post_init();
+    }
+    /*
+     * This routine can be overidden to
+     * perform any pre-init ops without having to
+     * rewrite the constructor
+     */
+    protected function pre_init()
+    {
+       return;
+    }
+    /*
+     * This routine can be overidden to
+     * perform any post-init ops without having to
+     * rewrite the constructor
+     */
+    protected function post_init()
+    {
+        return;
     }
     /*
      * the handler for a GET request

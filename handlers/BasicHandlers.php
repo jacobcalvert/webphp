@@ -54,3 +54,17 @@ class ExampleHandler extends webphp\WebRequest
         $this->write(NULL);
     }
 }
+
+class AlwaysSSLHandler extends webphp\WebRequest
+{
+    public function pre_init()
+    {
+        $this->params["require_ssl"] = true; // setting this will require all urls handled by this handler to use ssl
+    }
+    public function get()
+    {
+        $this->add_header("Content-Type", "application/json");
+        $this->write(json_encode($this->params, JSON_UNESCAPED_SLASHES)); 
+    }
+    
+}
