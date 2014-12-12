@@ -19,6 +19,9 @@ The child class must implement whatever methods it wishes to use at the URL that
 want to have GET requests be valid on a certain handler, only define the get() method. If another HTTP verb is used to 
 access that URL, the parent WebRequest class will return a 501 (Not Implemented) response, and your class will never be hit.
 
+### Features
+* Inheritable WebRequest class to provide basic API implementation quickly
+* Ability to force SSL on a URL map
 
 
 ### Issues
@@ -27,4 +30,6 @@ access that URL, the parent WebRequest class will return a 501 (Not Implemented)
 * I will certainly find more!!
 
 
+### Updates
+* Added ability to force SSL (see the example in the url_maps.php file) for a UrlMap [12/11/2014]
 Thanks for looking!

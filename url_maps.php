@@ -27,6 +27,6 @@ include_once 'classes/UrlMap.class.php';
 
 $url_maps = array
 (
-    new webphp\UrlMap("/?", array(), 'ExampleHandler', array('is_root'=>true)),
+    new webphp\UrlMap("/?", array(), 'ExampleHandler', array('require_ssl'=>true)),
     new webphp\UrlMap("/(.+)/?", array("the_variable"),'ExampleHandler', array())
 );

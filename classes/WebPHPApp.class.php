@@ -80,6 +80,7 @@ class WebPHPApp
             $web_request_obj = new WebRequest($request_headers);
             $web_request_obj->set_response_code(500);
             $web_request_obj->write(NULL);
+            return;
         }
         else
         {
@@ -88,16 +89,23 @@ class WebPHPApp
             $web_request_obj = new $match_class($request_headers, array_merge($params, $this->url_params));
         }
         
+        if($web_request_obj->require_ssl() && !$this->is_ssl())
+        {
+            $web_request_obj->set_response_code(501);
+            $web_request_obj->write("Connection must be over SSL.");
+            return;
+        }
+        
         switch($method)
         {
-            case "GET":     $web_request_obj->get();break;
-            case "HEAD":    $web_request_obj->head();break;
-            case "POST":    $web_request_obj->post();break;
-            case "PUT":     $web_request_obj->put();break;
-            case "DELETE":  $web_request_obj->delete();break;
-            case "OPTIONS": $web_request_obj->options();break;
-            case "CONNECT": $web_request_obj->connect();break;
-            case "TRACE":   $web_request_obj->trace();break;
+            case "GET":         $web_request_obj->get();break;
+            case "HEAD":        $web_request_obj->head();break;
+            case "POST":        $web_request_obj->post();break;
+            case "PUT":         $web_request_obj->put();break;
+            case "DELETE":      $web_request_obj->delete();break;
+            case "OPTIONS":     $web_request_obj->options();break;
+            case "CONNECT":     $web_request_obj->connect();break;
+            case "TRACE":       $web_request_obj->trace();break;
             default:
             {
                 $web_request_obj->set_response_code(501);
@@ -108,5 +116,32 @@ class WebPHPApp
         
         
     }
-    
+        /*
+     * returns if the connection is over https or not
+     * @return boolean is the connection https or not
+     */
+    final protected function is_ssl() 
+    {
+        if ( isset($_SERVER['HTTPS']) ) 
+        {
+            // check two ways if the SERVER superglobal reports HTTPS
+            if (strtolower($_SERVER['HTTPS']) == "on")
+            {
+               return true; 
+            }
+                
+            if ($_SERVER['HTTPS'] == '1')
+            {
+              return true;  
+            }
+                
+        } 
+        //otherwise, check the port... this could be a bad way, but it works
+        elseif (isset($_SERVER['SERVER_PORT']) && ($_SERVER['SERVER_PORT'] == '443'))
+        {
+            return true;
+        }
+        
+        return false;
+    }
 }

@@ -106,13 +106,19 @@ class WebRequest
     {
         $this->set_response_code(501);
         $this->write($msg);        
+}
+    /*
+     * returns a boolean determining if we require ssl or not on this handler
+     */
+    final public function require_ssl()
+    {
+        return isset($this->params["require_ssl"]) && $this->params["require_ssl"] ;
     }
-
     /*
      * sets the HTTP response code
      * @param $resp_code an int represeting the response code (i.e 206, 404, 302, etc)
      */
-    public function set_response_code($resp_code)
+    final public function set_response_code($resp_code)
     {
         $this->resp_code = $resp_code;
     }
@@ -121,7 +127,7 @@ class WebRequest
      * @param $header_key the header key (i.e 'Content-Length')
      * @param $header_val the header value (i.e 1244) 
      */
-    public function add_header($header_key, $header_val)
+    final public function add_header($header_key, $header_val)
     {
         $this->extra_headers[$header_key] = $header_val;
     }
@@ -130,7 +136,7 @@ class WebRequest
      * this function assembles the extra headers and writes the data to the client
      * @param $data the data to be writter
      */
-    public function write($data)
+    final public function write($data)
     {
         http_response_code($this->resp_code);
         foreach($this->extra_headers as $k=>$v)
