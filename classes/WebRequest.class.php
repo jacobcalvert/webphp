@@ -167,5 +167,13 @@ class WebRequest
         }
         echo $data;
     }
-    
+    /*
+     * returns true if the param specified by $param_key is set,
+     * false otherwise
+     * @param $param_key the parameter key to be checked
+     */
+    final protected function has_param($param_key)
+    {
+        return array_key_exists($param_key, $this->params);
+    }
 }
