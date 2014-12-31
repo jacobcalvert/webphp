@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+include_once dirname(__FILE__).'/../classes/HTMLTemplate.class.php';
 class ExampleHandler extends webphp\WebRequest
 {
     /*
@@ -67,4 +67,54 @@ class AlwaysSSLHandler extends webphp\WebRequest
         $this->write(json_encode($this->params, JSON_UNESCAPED_SLASHES)); 
     }
     
+}
+
+class TemplateExampleHandler extends AlwaysSSLHandler
+{
+    function get()
+    {
+        $data = array
+        (
+            "users" => array
+            (
+                array
+                (
+                    "name"=>"jacob",
+                    "contactinfo"=>array
+                    (
+                        "phone"=>"123.456.7890",
+                        "email"=>"some.thing@abc123.com"
+                    )
+                ),
+                array
+                (
+                    "name" => "grumpy",
+                    "contactinfo"=>array
+                    (
+                        "phone"=>"555.555.5555",
+                        "email"=>"grumps@example.com"
+                    )
+                ),
+                array
+                (
+                    "name" => "dr. frankenstein",
+                    "contactinfo"=>array
+                    (
+                        "phone"=>"555.867.5309",
+                        "email"=>"frankie@labcorp.com"
+                    )
+                )
+            ),
+            "tables"=> array
+            (
+                "people"=>array("heading"=>"People's Table"),
+                "others"=>array("heading"=> $this->params["the_variable"]),
+            ),
+            "title"=>"The Title"
+        );
+        
+        $template = new webphp\HTMLTemplate(dirname(__FILE__)."/../templates/example_template.html");
+        
+        $this->write($template->render($data));
+    }
 }

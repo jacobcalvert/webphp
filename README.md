@@ -23,6 +23,7 @@ access that URL, the parent WebRequest class will return a 501 (Not Implemented)
 * Inheritable WebRequest class to provide basic API implementation quickly
 * Ability to force SSL on a URL map
 * Ability to force SSL on all URLs using a specific handler
+* Template system that is completely detached from the rest of the implementation.
 
 
 ### Issues
@@ -36,4 +37,5 @@ access that URL, the parent WebRequest class will return a 501 (Not Implemented)
 * Added ability to force SSL (see the example in the url_maps.php file) for a UrlMap [12/11/2014]
 * Added pre_init and post_init methods so a child class can do extra initialization without rewriting the constructor [12/12/2014]
 * Added example for forcing ssl on every URL that uses a specific handler [12/12/2014]
+* Added template system and examples [12/30/2014]
 Thanks for looking!
