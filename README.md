@@ -28,8 +28,8 @@ access that URL, the parent WebRequest class will return a 501 (Not Implemented)
 
 ### Issues
 * Getting the key=>value pairs from PUT, DELETE, etc. is a little tricky still. If the request is made using a form-data encoding as opposed to raw, I can't capture them
-* Relies on .htaccess for the rewrite magic
 * Cannot seek inside media files like mp4. But they play!
+* The URL matching only matches the highest match value
 * I will certainly find more!!
 
 

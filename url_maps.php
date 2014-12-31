@@ -28,7 +28,8 @@ include_once 'classes/UrlMap.class.php';
 $url_maps = array
 (
     new webphp\UrlMap("/?", array(), 'ExampleHandler', array('require_ssl'=>true)),
-    new webphp\UrlMap("/(.+)/?", array("the_variable"),'ExampleHandler', array()),
+    
+    new webphp\UrlMap("/subdir/(.+)/?", array("the_variable"),'ExampleHandler', array("subdir"=>true)),
     new webphp\UrlMap("/always_ssl/(.+)/?", array("the_variable"), 'AlwaysSSLHandler', array()),
     new webphp\UrlMap("/template/(.+)/?", array("the_variable"), 'TemplateExampleHandler', array()),
     new webphp\UrlMap("/static/(.+)", array(), "StaticFileHandler", array("root"=>dirname(__FILE__).'/static/'))
