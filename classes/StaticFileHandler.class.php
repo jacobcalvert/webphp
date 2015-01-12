@@ -39,86 +39,115 @@ class StaticFileHandler extends webphp\WebRequest
         if(!$path)
         {
             $this->set_response_code(404);
-            $this->write("");
+            $this->write(NULL);
         }
         else
         {
-            $finfo = finfo_open();
-            $mime = finfo_file($finfo, $path, FILEINFO_MIME);
-            $this->add_header("Content-Length", filesize($path));
-            $this->add_header("Content-Type", $mime);
+            $meta = $this->get_file_meta();
+            $this->add_header("Content-Type", $meta["mime"]);
+            $this->add_header("Content-Length", $meta["size"]);
             $this->add_header("Accept-Ranges", "bytes");
+            
             $this->write(NULL);
+            
         }
     }
     public function get()
     {
-        $range = $this->get_range();
         $path = $this->file_path();
         if(!$path)
         {
             $this->set_response_code(404);
-            $this->write("");
+            $this->write(NULL);
         }
         else
         {
-            $file_len = filesize($path);
-            $this->add_header("Content-Length", $file_len);
-            $finfo = finfo_open();
-            $mime = finfo_file($finfo, $path, FILEINFO_MIME);
+            $meta = $this->get_file_meta();
+            $range = $this->get_range();
+            $this->add_header("Content-Type", $meta["mime"]);
+            $this->add_header("Accept-Ranges", "bytes");
             
-            $handle = fopen($path, 'rb');
-            $start = $range["range_begin"];
-            
-            if($start >= $file_len)
+            if($range[0] > $meta["size"] || $range[1] > $meta["size"])
             {
-                $this->write("");
+                $this->set_response_code(416); //not satisfiable
+                $this->write(NULL);
+                exit;
             }
-            fseek($handle, $start);
-            $read_len = ($range["range_end"]-$start < $file_len-$start)?$range["range_end"]-$start:$file_len-$start;
-            if($start + $read_len < $file_len)
+            else
             {
-                $this->set_response_code(206); //partial file
-            }
-            $this->add_header("Content-Type", $mime);
-            $this->add_header("Content-Range:", "$start-".($start+$read_len)."/$file_len");
-            
-            $buffer = 1024*8;
-            while(!feof($handle) && (($p = ftell($handle))) <= ($start+$read_len))
-            {
-                if ($p + $buffer > $start+$read_len) 
-                {
-                    $buffer = $start+$read_len - $p + 1;
-                }
-                $this->write(fread($handle, $buffer));
-                flush();
-            }
+                $bytes_start = $range[0];
+                $bytes_end = $range[1];
+                $content_length = $bytes_end - $bytes_start ;
+                $this->add_header("Content-Length", $content_length);
+                $this->add_header("Content-Range", "bytes $bytes_start-$bytes_end/".$meta['size']);
                 
-           
-            
+                if($bytes_end != $meta["size"])
+                {
+                    $this->set_response_code(206); //partial
+                }
+                
+                $file_ptr = fopen($path, "rb");
+               
+                
+                fseek($file_ptr, $bytes_start);
+                
+                $buffer = 1024 * 8;
+                $this->send_headers();
+                $p = ftell($file_ptr);
+                
+                
+                while(!feof($file_ptr) && $p <= $bytes_end) 
+                {
+                    if ($p + $buffer > $bytes_end)
+                    {
+                        
+                            $buffer = $bytes_end - $p + 1;
+                    }
+                    set_time_limit(0);
+                    $this->raw_write( fread($file_ptr, $buffer));
+                    flush();
+                    $p = ftell($file_ptr);
+                }
+                
+                fclose($file_ptr);
+                
+                
+            }
+             
         }
     }
     
     private function get_range()
     {
-        $parts2 = NULL;
+        $return = NULL;
+        $meta = $this->get_file_meta();
         if(array_key_exists("HTTP_RANGE", $this->request_headers))
         {
-            $range_str = $this->request_headers["HTTP_RANGE"];
-            $parts1 = explode("=", $range_str);
-            $parts2 = explode("-", $parts1[1]);
-            if($parts2[1] == "")
+            
+            $range = explode("=", $this->request_headers['HTTP_RANGE']);
+            $range_parts = explode("-", $range[1]);
+            
+            if(substr($range[1], -1) != "-")
             {
-                $parts2[1] = filesize($this->file_path());
+                $range_parts[0] = (int) $range_parts[0];
+                $range_parts[1] = (int) $range_parts[1];
             }
+            else
+            {
+                
+                $range_parts[0] = (int) substr($range[1],0, strlen($range[1])-1);
+                $range_parts[1] = $meta["size"]; //min(array($meta["size"], ($range_parts[0] + 1048576)));
+                               
+            }
+            
         }
         else
         {
-           $parts2[0] = 0;
-           $parts2[1] = filesize($this->file_path());
+            $range_parts = array(0=>0, 1=>$meta["size"]);
         }
+        $return = $range_parts;
         
-        return array("range_begin"=> (int) $parts2[0], "range_end"=> (int) $parts2[1]);
+        return $return;
     }
     
     private function file_path()
@@ -134,5 +163,18 @@ class StaticFileHandler extends webphp\WebRequest
     {
         return $this->file_path();
         
+    }
+    
+    private function get_file_meta()
+    {
+        //file must exist for this to work
+        $finfo = finfo_open(FILEINFO_MIME_TYPE); 
+        
+        $return = array
+        (
+            "size" => filesize($this->file_path()),
+            "mime" => finfo_file($finfo, $this->file_path())
+        );
+        return $return;
     }
 }

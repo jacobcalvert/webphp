@@ -160,13 +160,27 @@ class WebRequest
      */
     final public function write($data)
     {
+        $this->send_headers();
+        echo $data;
+        exit();
+    }
+    /*
+     * send the headers, but write no data
+     */
+    final public function send_headers()
+    {
         http_response_code($this->resp_code);
         foreach($this->extra_headers as $k=>$v)
         {
             header($k.": ".$v);
         }
+    }
+    
+    final public function raw_write($data)
+    {
         echo $data;
     }
+    
     /*
      * returns true if the param specified by $param_key is set,
      * false otherwise
