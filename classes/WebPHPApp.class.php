@@ -74,12 +74,12 @@ class WebPHPApp
         
         $web_request_obj = NULL;
         
-        if($match_class == NULL || $match_level == -1)
+        if($match_class == NULL || $match_level <= 0)
         {
             //error no match
             $web_request_obj = new WebRequest($request_headers);
             $web_request_obj->set_response_code(500);
-            $web_request_obj->write(NULL);
+            $web_request_obj->write("URL not allowed.");
             return;
         }
         else

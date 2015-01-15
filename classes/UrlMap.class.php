@@ -50,13 +50,42 @@ class UrlMap
      */
     public function match_level($url)
     {
-        $regex = "/".str_replace("/", "\/", $this->map_url)."/";
-        $matches = array();
+        $num_groups = $this->num_match_groups($this->map_url);
+        if($num_groups == 0)
+        {
+            $regex = "/".str_replace("/", "\/", $this->map_url)."/";
+            $regex2 = "/".str_replace("/", "\/", $url)."/"; 
+
+            if(preg_match($regex, $url) && preg_match($regex2, $this->map_url))
+            {
+              return 1000; //exact match
+            }
+           return -1;
+        }
+        else
+        {
+            $regex = "/".str_replace("/", "\/", $this->map_url)."/";
+            $matches = array();
         
-        preg_match($regex, $url, $matches);
+            preg_match($regex, $url, $matches);
         
-        return count($matches);
+            return count($matches);
+        }
+        
+
     }
+    private function num_match_groups($regex)
+    {
+        $count1 = substr_count($regex, "(");
+        $count2 = substr_count($regex, ")");
+        
+        if($count1 != $count2)
+        {
+            //error
+        }
+        return $count1;
+    }
+    
     /*
      * parses the params out of the given url
      * @param $url the url to parse
